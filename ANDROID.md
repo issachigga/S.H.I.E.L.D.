@@ -2,7 +2,7 @@
 
 面向 [ClashMi](https://clashmi.app/guide/)（iPhone / iPad / Android）和 [MetaCubeX/ClashMetaForAndroid](https://github.com/MetaCubeX/ClashMetaForAndroid) 的新版 mihomo 内核。两者共用下方 YAML，文件名保留不变以免旧下载链接失效。不保证旧版 Clash for Android 或其他内核兼容。
 
-[下载 YAML 模板](https://raw.githubusercontent.com/issachigga/shadowrocket-config/main/clash-meta-android.yaml)
+[下载 YAML 模板](https://raw.githubusercontent.com/issachigga/S.H.I.E.L.D./main/clash-meta-android.yaml)
 
 ## 必须先添加自己的节点
 

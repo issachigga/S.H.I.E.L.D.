@@ -1,14 +1,20 @@
-# Shadowrocket 配置
+# S.H.I.E.L.D.
+
+神盾局 · Shadowrocket 分流与加密 DNS 配置，适用于 iPhone、iPad 和 Mac。
+
+[下载主配置 S.H.I.E.L.D.conf](https://raw.githubusercontent.com/issachigga/S.H.I.E.L.D./main/S.H.I.E.L.D.conf) · [查看配置内容](S.H.I.E.L.D.conf)
+
+`shadowrocket.conf` 保留为旧链接兼容副本，两份内容相同，不区分 Mac/iOS。旧副本的更新地址也指向主配置。
 
 ClashMi（iOS / Android）及 Clash Meta for Android 用户请看 [Clash YAML 模板与使用教程](ANDROID.md)。需在本地加入自己的 Clash 格式节点/订阅，再导入使用；公开模板不含节点。ClashMi 还需检查客户端 DNS/规则覆写和 TUN 设置。
 
-面向已有可用代理节点的 Shadowrocket 用户。建议使用 2.2.92 或更新版本。
+面向已有可用代理节点的 Shadowrocket 用户。配置使用 2.2.92 已有字段，建议升级至当前正式版。2026-11-01 核对 [App Store](https://apps.apple.com/us/app/shadowrocket/id932747118) 的最新版本为 **2.2.93**（2026-10-29 发布），包括 macOS 菜单栏、隧道路由、本地网络及稳定性修复；无需改用另一套 conf 格式。
 
 ## 导入与选择节点
 
 ### 一键导入（iPhone / iPad）
 
-[点击导入 Shadowrocket 配置](https://lowertop.github.io/Shadowrocket-First/redirect.html?url=shadowrocket%3A%2F%2Fconfig%2Fadd%2Fhttps%3A%2F%2Fraw.githubusercontent.com%2Fissachigga%2Fshadowrocket-config%2Fmain%2Fshadowrocket.conf)
+[点击导入 Shadowrocket 配置](https://lowertop.github.io/Shadowrocket-First/redirect.html?url=shadowrocket%3A%2F%2Fconfig%2Fadd%2Fhttps%3A%2F%2Fraw.githubusercontent.com%2Fissachigga%2FS.H.I.E.L.D.%2Fmain%2FS.H.I.E.L.D.conf)
 
 先安装 Shadowrocket，建议用 Safari 打开；允许跳转至 Shadowrocket，再按软件提示完成导入。若没有自动跳转，点击跳转页的“一键安装”按钮。导入后检查当前配置是否选中、全局路由是否为“配置”。先备份原配置。
 
@@ -17,14 +23,14 @@ ClashMi（iOS / Android）及 Clash Meta for Android 用户请看 [Clash YAML �
 不想经过第三方页面，可复制下列完整链接到 Safari 地址栏打开（需手机实测）：
 
 ```text
-shadowrocket://config/add/https://raw.githubusercontent.com/issachigga/shadowrocket-config/main/shadowrocket.conf
+shadowrocket://config/add/https://raw.githubusercontent.com/issachigga/S.H.I.E.L.D./main/S.H.I.E.L.D.conf
 ```
 
 ### 手动导入备用地址
 
 配置下载地址：
 
-https://raw.githubusercontent.com/issachigga/shadowrocket-config/main/shadowrocket.conf
+https://raw.githubusercontent.com/issachigga/S.H.I.E.L.D./main/S.H.I.E.L.D.conf
 
 在 Shadowrocket「配置」中添加上述 URL，下载后选中配置；首页「全局路由」选择「配置」。先备份原配置。
 
@@ -32,10 +38,22 @@ https://raw.githubusercontent.com/issachigga/shadowrocket-config/main/shadowrock
 
 节点和订阅由每个使用者自己添加，配置更新不会替你提供节点。首次导入需检查所有远程规则是否下载成功。
 
+### Mac 端导入
+
+Mac 与 iPhone/iPad 使用同一份主配置。这里没有网卡名、某台路由器的地址或设备专属进程规则，因此不需要维护两套 DNS/分流。系统的 VPN 权限、隧道及本地网络选项由各设备自己的客户端管理。
+
+1. 从官方 App Store 安装/更新 Shadowrocket，在「配置」页面添加上方主配置 URL，或下载 `S.H.I.E.L.D.conf` 后通过本地文件导入。按钮名称以当前 Mac 版为准。
+2. 使用这份配置，将全局路由设为「配置」，在首页选择自己的真实节点，启动连接并按 macOS 提示允许 VPN 配置。国外组统一跟随首页节点。
+3. 2.2.93 提供菜单栏启动选项，可按个人习惯开启。若单个应用不跟随代理，检查它是否使用其他代理/VPN，以及小火箭的隧道设置；无需因此另下载“Mac 专用规则”。
+
+两端分别检查 DNS 和 IPv6 出口；共用配置格式不代表两端已经完成运行测试。使用 iCloud 同步时，先检查同步后的当前配置和节点选择。
+
 ## 分流和 DNS
 
 - Apple、国内媒体、小米、国内规则命中的网站直连；微软、Google、GitHub、AI 和其他国外服务走首页节点。
-- 未命中的目标默认代理；中国 IP 直连规则使用 no-resolve，不为地域判断主动触发额外 DNS 查询。
+- 未命中的目标默认代理；国内综合规则使用 `ChinaMax_Domain.list` 中明确收录的域名，国内 IP 使用纯 IP 的 `ChinaIPs.list` 和 GeoIP CN，并保留 `no-resolve`。
+- 不再引用混合的 `ChinaMax.list`，避免其中宽泛的 `.ms` 后缀、`stripe` 关键字及 User-Agent 规则将陌生域名判为直连。未收录的国内域名可能走代理；若需要例外，先核对再按完整域名/后缀添加。
+- YouTube 规则位于 Google 规则之前；国外媒体同时引用 `GlobalMedia.list` 和配套 `GlobalMedia_Domain.list`。
 - 主 DNS：Cloudflare DoH，经代理；备用：Google DoH，经代理。
 - 直连域名 DNS：阿里、腾讯 DoH，不使用系统 DNS 覆盖。
 - 节点入口域名：阿里、腾讯 DoH，独立于国外网站解析，避免代理入口解析循环。国内解析商仍能看到它负责的查询。
@@ -45,6 +63,8 @@ https://raw.githubusercontent.com/issachigga/shadowrocket-config/main/shadowrock
 
 DoH 加密传输，不保证解析商不记录查询。直连网站仍可能通过 IP、TLS 信息暴露目标。配置不提供绝对匿名或全设备 kill switch 保证。关闭 VPN 后系统恢复直连，不属于本配置覆盖范围。
 
+内网 IP 可直接访问。当前 `private-ip-answer=false`，公共 DoH 不负责你家 NAS/PVE/OpenWrt 等设备的私有域名；使用私有域名时，在本地按需添加 Host/专用解析，不要把全局国外 DNS 改回系统 DNS。IPv6 本地 mDNS 组播 `ff02::fb/128` 已加入 TUN 旁路路由。
+
 ## QUIC 可选设置
 
 默认 `block-quic = always-allow`，不额外屏蔽 QUIC。若代理网页、视频不稳定，可在纯文本编辑中改为 `block-quic = all-proxy`：只阻断走代理连接的 QUIC，DIRECT 连接保留。不是关闭所有 UDP；少数不能回落 TCP 的应用可能失败。整份更新会覆盖此个人修改，更新后需重新设置。
@@ -53,7 +73,14 @@ DoH 加密传输，不保证解析商不记录查询。直连网站仍可能通�
 
 ## 更新
 
-配置含 update-url，指向本仓库 main 分支同一文件。可在配置界面手动更新；自动更新需在软件设置中启用，iOS 后台调度不保证准时执行。
+### v0.2 · 2026-11-01
+
+- 项目改名为 **S.H.I.E.L.D.**，主文件为 `S.H.I.E.L.D.conf`；旧文件保留兼容。
+- Mac/iOS 共用一份配置，补充 Mac 导入步骤和 2.2.93 更新说明。
+- 国内混合规则改为明确域名 + 纯 IP 列表，修正陌生域名被宽泛规则直连的问题。
+- 补齐国外媒体域名集，将 YouTube 放到 Google 前面，并补充 IPv6 本地 mDNS 路由。
+
+配置含 update-url，指向本仓库 main 分支的 `S.H.I.E.L.D.conf`。可在配置界面手动更新；自动更新需在软件设置中启用，iOS 后台调度不保证准时执行。仅刷新远程规则时，使用「使用配置 / 编译配置」；整份「更新配置」会覆盖本地编辑。
 
 远程规则来自第三方仓库，经 jsDelivr CDN 获取，由 Shadowrocket 下载/缓存。检查刷新状态；CDN 可能延迟、不可达或上游变化，不承诺自动更新一定成功。若 raw GitHub 无法下载，先使用已有可用配置/节点，不删除原配置。
 
@@ -61,7 +88,7 @@ DoH 加密传输，不保证解析商不记录查询。直连网站仍可能通�
 
 ## 测试状态与验证
 
-v0.1 仅做静态检查与远程资源可用性检查，**尚未在 iPhone 做 DNS 出口、IPv6 或故障回退实测，不保证零泄漏**。应用自带 DoH/DoQ、其他模块和特殊网络可能改变实际行为。
+v0.2 已检查配置结构、策略引用、远程规则可用性，以及本次修复涉及的域名匹配。**尚未在 iPhone/Mac 做完整 VPN 的 DNS 出口、IPv6 或故障回退实测，不保证零泄漏**。应用自带 DoH/DoQ、其他模块和特殊网络可能改变实际行为。
 
 1. VPN 开启、配置模式下测试国内和国外域名，查看连接记录、命中策略及 DNS 出口。
 2. 首页切换节点，重启相关应用/连接，确认新连接与 DNS 出口跟随。
