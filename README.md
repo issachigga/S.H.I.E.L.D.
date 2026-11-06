@@ -65,13 +65,33 @@ DoH 加密传输，不保证解析商不记录查询。直连网站仍可能通�
 
 内网 IP 可直接访问。当前 `private-ip-answer=false`，公共 DoH 不负责你家 NAS/PVE/OpenWrt 等设备的私有域名；使用私有域名时，在本地按需添加 Host/专用解析，不要把全局国外 DNS 改回系统 DNS。IPv6 本地 mDNS 组播 `ff02::fb/128` 已加入 TUN 旁路路由。
 
-## QUIC 可选设置
+## QUIC 设置
 
-默认 `block-quic = always-allow`，不额外屏蔽 QUIC。若代理网页、视频不稳定，可在纯文本编辑中改为 `block-quic = all-proxy`：只阻断走代理连接的 QUIC，DIRECT 连接保留。不是关闭所有 UDP；少数不能回落 TCP 的应用可能失败。整份更新会覆盖此个人修改，更新后需重新设置。
+v0.3 默认 `block-quic = all-proxy`：**只阻断走代理的 QUIC，DIRECT 直连保留 QUIC**。因此 YouTube、Instagram、X/Twitter 等代理流量会受到限制，其他走代理的服务也一样；范围不限于这三个 App。
 
-参考：[维护者配置说明](https://github.com/LOWERTOP/Shadowrocket/blob/main/lazy.conf)。不额外附带模块。
+它没有关闭所有 UDP，不会把 Hysteria2/TUIC 节点的传输协议改为 TCP。对支持回退的 HTTPS 请求，阻断 QUIC 后客户端通常会改用基于 TCP 的 HTTP/2 或 HTTP/1.1；不是把 UDP 数据转换成 TCP。不支持 TCP 回退的请求可能失败，也不保证阻断后一定更快。
+
+三个可选值：
+
+| 值 | 本开关的效果 |
+| --- | --- |
+| `all-proxy`（默认） | 代理 QUIC 阻断，DIRECT QUIC 保留 |
+| `all` | 代理和 DIRECT 的 QUIC 都阻断 |
+| `always-allow` | 关闭本开关的 QUIC 阻断 |
+
+恢复代理 QUIC：在配置的纯文本编辑中，将 `block-quic = all-proxy` 改回 `block-quic = always-allow`。整份更新会恢复仓库的默认值。
+
+更新后重新连接 VPN，再退出重开相关 App，避免旧连接继续沿用。用连接日志核对代理目标的协议；测试 DIRECT 网站时也要确认实际命中 DIRECT。上述范围仅描述这个开关，其他模块或上游路由器的拦截规则另行生效。
+
+写法参考：[配置维护者的 QUIC 参数说明](https://github.com/LOWERTOP/Shadowrocket/blob/main/lazy.conf)。当前只完成文件检查，尚未在 iPhone/Mac 实测 QUIC 回退。
 
 ## 更新
+
+### v0.3 · 2026-11-06
+
+- 将 QUIC 设置改为 `all-proxy`：所有代理连接禁用 QUIC，DIRECT 直连保留。
+- DNS、IPv6、分流规则和首页手选节点方案沿用 v0.2，主文件及旧链接副本同步更新。
+- 补充三种开关值、恢复方法和回退验证说明。
 
 ### v0.2 · 2026-11-01
 
@@ -88,7 +108,7 @@ DoH 加密传输，不保证解析商不记录查询。直连网站仍可能通�
 
 ## 测试状态与验证
 
-v0.2 已检查配置结构、策略引用、远程规则可用性，以及本次修复涉及的域名匹配。**尚未在 iPhone/Mac 做完整 VPN 的 DNS 出口、IPv6 或故障回退实测，不保证零泄漏**。应用自带 DoH/DoQ、其他模块和特殊网络可能改变实际行为。
+v0.2 已检查配置结构、策略引用、远程规则可用性及域名匹配；v0.3 核对了 QUIC 参数和两份配置一致性，并确认 DNS、IPv6、策略组及分流规则与 v0.2 相同。**尚未在 iPhone/Mac 做完整 VPN 的 DNS 出口、IPv6 或故障回退实测，不保证零泄漏**。应用自带 DoH/DoQ、其他模块和特殊网络可能改变实际行为。
 
 1. VPN 开启、配置模式下测试国内和国外域名，查看连接记录、命中策略及 DNS 出口。
 2. 首页切换节点，重启相关应用/连接，确认新连接与 DNS 出口跟随。
